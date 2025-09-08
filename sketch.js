@@ -114,9 +114,11 @@ function drawLeftArm() {
 
   let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
   let leftElbowPosition = pose.keypoints[LEFTELBOWINDEX];
+  let leftWristPosition = pose.keypoints[LEFTWRISTINDEX];
 
   strokeWeight(50);
   line(leftShoulderPosition.x, leftShoulderPosition.y, leftElbowPosition.x, leftElbowPosition.y);
+  line(leftElbowPosition.x, leftElbowPosition.y, leftWristPosition.x, leftWristPosition.y);
   strokeWeight(1);
 }
 
