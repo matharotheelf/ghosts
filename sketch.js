@@ -6,6 +6,9 @@
  * This example demonstrates drawing skeletons on poses for the MoveNet model.
  */
 
+const LEFTEARINDEX = 3;
+const RIGHTEARINDEX = 4;
+
 let video;
 let bodyPose;
 let poses = [];
@@ -51,6 +54,8 @@ function draw() {
     }
   }
 
+  drawHead();
+
   // Draw all the tracked landmark points
   for (let i = 0; i < poses.length; i++) {
     let pose = poses[i];
@@ -64,6 +69,25 @@ function draw() {
       }
     }
   }
+}
+
+function drawHead() {
+  if (poses.length < 1) {
+    return;
+  }
+
+  let pose = poses[0];
+
+  let leftEarPosition = pose.keypoints[LEFTEARINDEX];
+  let rightEarPosition =  pose.keypoints[RIGHTEARINDEX];
+  let headCentre = createVector(leftEarPosition.x + rightEarPosition.x, leftEarPosition.y + rightEarPosition.y).mult(0.5);
+  let headWidth = dist(leftEarPosition.x, leftEarPosition.y, rightEarPosition.x, rightEarPosition.y);
+  let headHeight = headWidth * 1.5;
+
+  console.log(headCentre, headWidth, headHeight);
+
+  ellipse(headCentre.x, headCentre.y, headWidth, headHeight);
+
 }
 
 // Callback function for when bodyPose outputs data
