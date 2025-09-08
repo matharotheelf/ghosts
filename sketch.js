@@ -79,7 +79,7 @@ function draw() {
     addPoseToSequence();
   }
 
-  drawBodyShapes(currentPose);
+  // drawBodyShapes(currentPose);
   drawPastSequences();
 
   // Draw all the tracked landmark points
@@ -174,6 +174,25 @@ function drawPastSequences() {
 }
 
 function drawSequenceFrame(keypoints) {
+  if (currentPose == null) {
+    return;
+  }
+
+  averageDistance = 0;
+
+  for (let i = 0; i < keypoints.length; i++) {
+    let framekeypoint = keypoints[i];
+    let currentkeypoint = currentPose.keypoints[i];
+    averageDistance += dist(framekeypoint.x, framekeypoint.y, currentkeypoint.x, currentkeypoint.y);
+  }
+
+  averageDistance /= keypoints.length;
+
+  alpha = map(averageDistance, 100, 0, 0, 100);
+
+  stroke(0, 255, 255, alpha);
+  fill(0, 255, 255, alpha);
+
   drawHead(keypoints);
   drawChest(keypoints);
   drawLeftArm(keypoints);
