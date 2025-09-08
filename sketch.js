@@ -12,6 +12,10 @@ const LEFTSHOULDERINDEX = 5;
 const RIGHTSHOULDERINDEX = 6;
 const LEFTWAISTINDEX = 12;
 const RIGHTWAISTINDEX = 11;
+const LEFTELBOWINDEX = 7;
+const RIGHTELBOWINDEX = 8;
+const LEFTWRISTINDEX = 9;
+const RIGHTWRISTINDEX = 10;
 
 
 let video;
@@ -105,13 +109,23 @@ function drawChest() {
   );
 }
 
-function drawBodyShapes() {
-  if (poses.length < 1) {
-    return;
-  }
+function drawLeftArm() {
+  let pose = poses[0];
 
-  drawHead();
-  drawChest();
+  let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
+  let leftElbowPosition = pose.keypoints[LEFTELBOWINDEX];
+
+  strokeWeight(50);
+  line(leftShoulderPosition.x, leftShoulderPosition.y, leftElbowPosition.x, leftElbowPosition.y);
+  strokeWeight(1);
+}
+
+function drawBodyShapes() {
+  if (poses.length > 0) {
+    drawHead();
+    drawChest();
+    drawLeftArm();
+  }
 }
 
 // Callback function for when bodyPose outputs data
