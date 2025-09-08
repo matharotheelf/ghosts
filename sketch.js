@@ -21,6 +21,7 @@ const RIGHTWRISTINDEX = 10;
 let video;
 let bodyPose;
 let poses = [];
+let pose;
 let connections;
 
 function preload() {
@@ -81,8 +82,6 @@ function draw() {
 }
 
 function drawHead() {
-  let pose = poses[0];
-
   let leftEarPosition = pose.keypoints[LEFTEARINDEX];
   let rightEarPosition =  pose.keypoints[RIGHTEARINDEX];
   let headCentre = createVector(leftEarPosition.x + rightEarPosition.x, leftEarPosition.y + rightEarPosition.y).mult(0.5);
@@ -93,8 +92,6 @@ function drawHead() {
 }
 
 function drawChest() {
-  let pose = poses[0];
-
   let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
   let rightShoulderPosition =  pose.keypoints[RIGHTSHOULDERINDEX];
 
@@ -110,8 +107,6 @@ function drawChest() {
 }
 
 function drawLeftArm() {
-  let pose = poses[0];
-
   let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
   let leftElbowPosition = pose.keypoints[LEFTELBOWINDEX];
   let leftWristPosition = pose.keypoints[LEFTWRISTINDEX];
@@ -124,6 +119,8 @@ function drawLeftArm() {
 
 function drawBodyShapes() {
   if (poses.length > 0) {
+    pose = poses[0];
+
     drawHead();
     drawChest();
     drawLeftArm();
