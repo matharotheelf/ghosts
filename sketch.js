@@ -48,37 +48,37 @@ function draw() {
   image(video, 0, 0, width, height);
 
   // Draw the skeleton connections
-  for (let i = 0; i < poses.length; i++) {
-    let pose = poses[i];
-    for (let j = 0; j < connections.length; j++) {
-      let pointAIndex = connections[j][0];
-      let pointBIndex = connections[j][1];
-      let pointA = pose.keypoints[pointAIndex];
-      let pointB = pose.keypoints[pointBIndex];
-      // Only draw a line if both points are confident enough
-      if (pointA.confidence > 0.1 && pointB.confidence > 0.1) {
-        stroke(255, 0, 0);
-        strokeWeight(2);
-        line(pointA.x, pointA.y, pointB.x, pointB.y);
-      }
-    }
-  }
+  // for (let i = 0; i < poses.length; i++) {
+  //   let pose = poses[i];
+  //   for (let j = 0; j < connections.length; j++) {
+  //     let pointAIndex = connections[j][0];
+  //     let pointBIndex = connections[j][1];
+  //     let pointA = pose.keypoints[pointAIndex];
+  //     let pointB = pose.keypoints[pointBIndex];
+  //     // Only draw a line if both points are confident enough
+  //     if (pointA.confidence > 0.1 && pointB.confidence > 0.1) {
+  //       stroke(0, 255, 0, 50);
+  //       strokeWeight(2);
+  //       line(pointA.x, pointA.y, pointB.x, pointB.y);
+  //     }
+  //   }
+  // }
 
   drawBodyShapes();
 
   // Draw all the tracked landmark points
-  for (let i = 0; i < poses.length; i++) {
-    let pose = poses[i];
-    for (let j = 0; j < pose.keypoints.length; j++) {
-      let keypoint = pose.keypoints[j];
-      // Only draw a circle if the keypoint's confidence is bigger than 0.1
-      if (keypoint.confidence > 0.1) {
-        fill(0, 255, 0);
-        noStroke();
-        circle(keypoint.x, keypoint.y, 10);
-      }
-    }
-  }
+  // for (let i = 0; i < poses.length; i++) {
+  //   let pose = poses[i];
+  //   for (let j = 0; j < pose.keypoints.length; j++) {
+  //     let keypoint = pose.keypoints[j];
+  //     // Only draw a circle if the keypoint's confidence is bigger than 0.1
+  //     if (keypoint.confidence > 0.1) {
+  //       fill(0, 255, 0);
+  //       noStroke();
+  //       circle(keypoint.x, keypoint.y, 10);
+  //     }
+  //   }
+  // }
 }
 
 function drawHead() {
@@ -117,13 +117,30 @@ function drawLeftArm() {
   strokeWeight(1);
 }
 
+function drawRightArm() {
+  let rightShoulderPosition = pose.keypoints[RIGHTSHOULDERINDEX];
+  let rightElbowPosition = pose.keypoints[RIGHTELBOWINDEX];
+  let rightWristPosition = pose.keypoints[RIGHTWRISTINDEX];
+
+  strokeWeight(50);
+  line(rightShoulderPosition.x, rightShoulderPosition.y, rightElbowPosition.x, rightElbowPosition.y);
+  line(rightElbowPosition.x, rightElbowPosition.y, rightWristPosition.x, rightWristPosition.y);
+  strokeWeight(1);
+
+}
+
+
 function drawBodyShapes() {
   if (poses.length > 0) {
     pose = poses[0];
 
+    stroke(0, 255, 0, 50);
+    fill(0, 255, 0, 50);
+
     drawHead();
     drawChest();
     drawLeftArm();
+    drawRightArm();
   }
 }
 
