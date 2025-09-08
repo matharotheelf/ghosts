@@ -17,11 +17,16 @@ const RIGHTELBOWINDEX = 8;
 const LEFTWRISTINDEX = 9;
 const RIGHTWRISTINDEX = 10;
 
+const SEQUENCELENGTH = 200;
 
+let isRecording = false;
+let currentSequence = [];
+let frameNumber = 0;
+let currentPose;
+let pastSequences = [];
 let video;
 let bodyPose;
 let poses = [];
-let pose;
 let connections;
 
 function preload() {
@@ -63,8 +68,19 @@ function draw() {
   //     }
   //   }
   // }
+  
+  currentPose = poses.length > 0 ? poses[0] : null;
 
-  drawBodyShapes();
+  if (isRecording) {
+    fill(255, 0, 0);
+    noStroke();
+    circle(20, 20, 20);
+
+    addPoseToSequence();
+  }
+
+  drawBodyShapes(currentPose);
+  drawPastSequences();
 
   // Draw all the tracked landmark points
   // for (let i = 0; i < poses.length; i++) {
@@ -81,9 +97,28 @@ function draw() {
   // }
 }
 
-function drawHead() {
-  let leftEarPosition = pose.keypoints[LEFTEARINDEX];
-  let rightEarPosition =  pose.keypoints[RIGHTEARINDEX];
+function addPoseToSequence() {
+  if (currentPose != null) {
+    let keypoints = currentPose.keypoints.map((keypoint) => {
+      return {
+        x: keypoint.x,
+        y: keypoint.y,
+        confidence: keypoint.confidence
+      };
+    });
+    currentSequence.push(keypoints);
+
+    if (currentSequence.length >= SEQUENCELENGTH) {
+      pastSequences.push(currentSequence);
+      currentSequence = [];
+      console.log('Saved a sequence! Total sequences:', pastSequences.length);
+    }
+  }
+}
+
+function drawHead(keypoints) {
+  let leftEarPosition = keypoints[LEFTEARINDEX];
+  let rightEarPosition =  keypoints[RIGHTEARINDEX];
   let headCentre = createVector(leftEarPosition.x + rightEarPosition.x, leftEarPosition.y + rightEarPosition.y).mult(0.5);
   let headWidth = dist(leftEarPosition.x, leftEarPosition.y, rightEarPosition.x, rightEarPosition.y);
   let headHeight = headWidth * 1.5;
@@ -91,12 +126,12 @@ function drawHead() {
   ellipse(headCentre.x, headCentre.y, headWidth, headHeight);
 }
 
-function drawChest() {
-  let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
-  let rightShoulderPosition =  pose.keypoints[RIGHTSHOULDERINDEX];
+function drawChest(keypoints) {
+  let leftShoulderPosition = keypoints[LEFTSHOULDERINDEX];
+  let rightShoulderPosition =  keypoints[RIGHTSHOULDERINDEX];
 
-  let leftWaistPosition = pose.keypoints[LEFTWAISTINDEX];
-  let rightWaistPosition =  pose.keypoints[RIGHTWAISTINDEX];
+  let leftWaistPosition = keypoints[LEFTWAISTINDEX];
+  let rightWaistPosition =  keypoints[RIGHTWAISTINDEX];
 
   quad(
     leftShoulderPosition.x, leftShoulderPosition.y,
@@ -106,10 +141,10 @@ function drawChest() {
   );
 }
 
-function drawLeftArm() {
-  let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
-  let leftElbowPosition = pose.keypoints[LEFTELBOWINDEX];
-  let leftWristPosition = pose.keypoints[LEFTWRISTINDEX];
+function drawLeftArm(keypoints) {
+  let leftShoulderPosition = keypoints[LEFTSHOULDERINDEX];
+  let leftElbowPosition = keypoints[LEFTELBOWINDEX];
+  let leftWristPosition = keypoints[LEFTWRISTINDEX];
 
   strokeWeight(50);
   line(leftShoulderPosition.x, leftShoulderPosition.y, leftElbowPosition.x, leftElbowPosition.y);
@@ -117,30 +152,49 @@ function drawLeftArm() {
   strokeWeight(1);
 }
 
-function drawRightArm() {
-  let rightShoulderPosition = pose.keypoints[RIGHTSHOULDERINDEX];
-  let rightElbowPosition = pose.keypoints[RIGHTELBOWINDEX];
-  let rightWristPosition = pose.keypoints[RIGHTWRISTINDEX];
+function drawRightArm(keypoints) {
+  let rightShoulderPosition = keypoints[RIGHTSHOULDERINDEX];
+  let rightElbowPosition = keypoints[RIGHTELBOWINDEX];
+  let rightWristPosition = keypoints[RIGHTWRISTINDEX];
 
   strokeWeight(50);
   line(rightShoulderPosition.x, rightShoulderPosition.y, rightElbowPosition.x, rightElbowPosition.y);
   line(rightElbowPosition.x, rightElbowPosition.y, rightWristPosition.x, rightWristPosition.y);
   strokeWeight(1);
-
 }
 
+function drawPastSequences() {
+  for (let i = 0; i < pastSequences.length; i++) {
+    let sequence = pastSequences[i];
+    let frame = sequence[frameNumber % sequence.length];
+    drawSequenceFrame(frame);
+  }
 
-function drawBodyShapes() {
-  if (poses.length > 0) {
-    pose = poses[0];
+  frameNumber = (frameNumber + 1) % SEQUENCELENGTH;
+}
 
+function drawSequenceFrame(keypoints) {
+  drawHead(keypoints);
+  drawChest(keypoints);
+  drawLeftArm(keypoints);
+  drawRightArm(keypoints);
+}
+
+function mousePressed() {
+  isRecording = !isRecording;
+}
+
+function drawBodyShapes(pose) {
+  if (pose != null) {
     stroke(0, 255, 0, 50);
     fill(0, 255, 0, 50);
 
-    drawHead();
-    drawChest();
-    drawLeftArm();
-    drawRightArm();
+    keypoints = pose.keypoints;
+
+    drawHead(keypoints);
+    drawChest(keypoints);
+    drawLeftArm(keypoints);
+    drawRightArm(keypoints);
   }
 }
 
