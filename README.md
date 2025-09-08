@@ -1,0 +1,2 @@
+# ghosts
+Ghost following pose
