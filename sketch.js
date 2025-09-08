@@ -8,6 +8,11 @@
 
 const LEFTEARINDEX = 3;
 const RIGHTEARINDEX = 4;
+const LEFTSHOULDERINDEX = 5;
+const RIGHTSHOULDERINDEX = 6;
+const LEFTWAISTINDEX = 12;
+const RIGHTWAISTINDEX = 11;
+
 
 let video;
 let bodyPose;
@@ -54,7 +59,7 @@ function draw() {
     }
   }
 
-  drawHead();
+  drawBodyShapes();
 
   // Draw all the tracked landmark points
   for (let i = 0; i < poses.length; i++) {
@@ -72,10 +77,6 @@ function draw() {
 }
 
 function drawHead() {
-  if (poses.length < 1) {
-    return;
-  }
-
   let pose = poses[0];
 
   let leftEarPosition = pose.keypoints[LEFTEARINDEX];
@@ -84,10 +85,33 @@ function drawHead() {
   let headWidth = dist(leftEarPosition.x, leftEarPosition.y, rightEarPosition.x, rightEarPosition.y);
   let headHeight = headWidth * 1.5;
 
-  console.log(headCentre, headWidth, headHeight);
-
   ellipse(headCentre.x, headCentre.y, headWidth, headHeight);
+}
 
+function drawChest() {
+  let pose = poses[0];
+
+  let leftShoulderPosition = pose.keypoints[LEFTSHOULDERINDEX];
+  let rightShoulderPosition =  pose.keypoints[RIGHTSHOULDERINDEX];
+
+  let leftWaistPosition = pose.keypoints[LEFTWAISTINDEX];
+  let rightWaistPosition =  pose.keypoints[RIGHTWAISTINDEX];
+
+  quad(
+    leftShoulderPosition.x, leftShoulderPosition.y,
+    rightShoulderPosition.x, rightShoulderPosition.y,
+    leftWaistPosition.x, leftWaistPosition.y,
+    rightWaistPosition.x, rightWaistPosition.y
+  );
+}
+
+function drawBodyShapes() {
+  if (poses.length < 1) {
+    return;
+  }
+
+  drawHead();
+  drawChest();
 }
 
 // Callback function for when bodyPose outputs data
