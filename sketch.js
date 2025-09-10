@@ -19,6 +19,9 @@ const RIGHTWRISTINDEX = 10;
 
 const SEQUENCELENGTH = 200;
 
+const DISTANCERANGE = 100;
+const ALPHARANGE = 100;
+
 let isRecording = false;
 let currentSequence = [];
 let frameNumber = 0;
@@ -178,17 +181,9 @@ function drawSequenceFrame(keypoints) {
     return;
   }
 
-  averageDistance = 0;
+  averageDistance = averageDistanceToPose(keypoints);
 
-  for (let i = 0; i < keypoints.length; i++) {
-    let framekeypoint = keypoints[i];
-    let currentkeypoint = currentPose.keypoints[i];
-    averageDistance += dist(framekeypoint.x, framekeypoint.y, currentkeypoint.x, currentkeypoint.y);
-  }
-
-  averageDistance /= keypoints.length;
-
-  alpha = map(averageDistance, 100, 0, 0, 100);
+  alpha = map(averageDistance, DISTANCERANGE, 0, 0, ALPHARANGE);
 
   stroke(0, 255, 255, alpha);
   fill(0, 255, 255, alpha);
@@ -197,6 +192,18 @@ function drawSequenceFrame(keypoints) {
   drawChest(keypoints);
   drawLeftArm(keypoints);
   drawRightArm(keypoints);
+}
+
+function averageDistanceToPose(keypoints) {
+  distance = 0;
+
+  for (let i = 0; i < keypoints.length; i++) {
+    let framekeypoint = keypoints[i];
+    let currentkeypoint = currentPose.keypoints[i];
+    distance += dist(framekeypoint.x, framekeypoint.y, currentkeypoint.x, currentkeypoint.y);
+  }
+
+  return distance/keypoints.length;
 }
 
 function mousePressed() {
